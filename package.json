@@ -1,0 +1,50 @@
+{
+  "name": "webconsole-images",
+  "version": "1.0.0",
+  "private": true,
+  "main": "server.js",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joyent/webconsole-images.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joyent/webconsole-images/issues"
+  },
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "scripts": {
+    "lint": "belly-button -f",
+    "pretest": "yarn run lint",
+    "test": "lab -v -a code",
+    "test-ci": "yarn run lint && lab -m 10000 -c -r junit -o test.xml -r html -o test.html -r console -o stdout"
+  },
+  "dependencies": {
+    "brule": "3.1.0",
+    "cloudapi-gql": "7.1.4",
+    "crumb": "7.0.0",
+    "hapi": "17.2.3",
+    "hapi-triton-auth": "2.0.1",
+    "instana-nodejs-sensor": "1.37.0",
+    "my-joy-images": "1.4.2"
+  },
+  "devDependencies": {
+    "belly-button": "4.x.x",
+    "cb-barrier": "1.x.x",
+    "code": "5.x.x",
+    "lab": "15.x.x"
+  },
+  "resolutions": {
+    "axios": "0.16.2",
+    "core-js": "2.5.3",
+    "regenerator-runtime": "0.11.1",
+    "pify": "3.0.0",
+    "parse-json": "3.0.0",
+    "hoist-non-react-statics": "2.5.0",
+    "stylis-rule-sheet": "0.0.10",
+    "react": "16.2.0",
+    "breeze-nexttick": "0.2.1",
+    "isarray": "1.0.0"
+  }
+}

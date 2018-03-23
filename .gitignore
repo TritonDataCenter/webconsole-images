@@ -54,6 +54,15 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
+# Various environment variable files
 .env
+.consul.env
+.env.js
+_env*
 
+keys-*/
+yarn.lock
+test.xml
+test.html
+
+.DS_Store

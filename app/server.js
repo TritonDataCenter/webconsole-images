@@ -3,18 +3,20 @@
 const Instana = require('instana-nodejs-sensor');
 Instana();
 
-const Brule = require('brule');
-const Crumb = require('crumb');
-const Hapi = require('hapi');
+// Core Node.js modules
 const { homedir } = require('os');
 const { join } = require('path');
 
+const Brule = require('brule');
+const Api = require('cloudapi-gql');
+const Crumb = require('crumb');
+const Hapi = require('hapi');
+const Sso = require('hapi-triton-auth');
+const Inert = require('inert');
+const Ui = require('my-joy-images');
+
 process.env.SDC_KEY_PATH =
   process.env.SDC_KEY_PATH || join(homedir(), '.ssh/id_rsa');
-
-const Sso = require('hapi-triton-auth');
-const Ui = require('my-joy-images');
-const Api = require('cloudapi-gql');
 
 const {
   PORT = 8082,
@@ -64,6 +66,9 @@ async function main () {
       }
     },
     {
+      plugin: Inert
+    },
+    {
       plugin: Sso,
       options: {
         ssoUrl: SSO_URL,
@@ -99,6 +104,19 @@ async function main () {
   ]);
 
   server.auth.default('sso');
+
+  server.route({
+    method: 'get',
+    path: `/${NAMESPACE}/versions`,
+    config: {
+      auth: false,
+      handler: {
+        file: {
+          path: join(__dirname, 'versions.json')
+        }
+      }
+    }
+  });
 
   await server.start();
   console.log(`server started at http://localhost:${server.info.port}`);

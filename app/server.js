@@ -7,6 +7,7 @@ Instana();
 const { homedir } = require('os');
 const { join } = require('path');
 
+const Blankie = require('blankie');
 const Brule = require('brule');
 const Api = require('cloudapi-gql');
 const Crumb = require('crumb');
@@ -14,6 +15,7 @@ const Hapi = require('hapi');
 const Sso = require('hapi-triton-auth');
 const Inert = require('inert');
 const Ui = require('my-joy-images');
+const Scooter = require('scooter');
 
 process.env.SDC_KEY_PATH =
   process.env.SDC_KEY_PATH || join(homedir(), '.ssh/id_rsa');
@@ -67,6 +69,19 @@ async function main () {
     },
     {
       plugin: Inert
+    },
+    {
+      plugin: Scooter
+    },
+    {
+      plugin: Blankie.plugin,
+      options: {
+        defaultSrc: ['self'],
+        imgSrc: '*',
+        scriptSrc: ['self', 'unsafe-inline', 'http://unpkg.com', 'http://cdn.jsdelivr.net'],
+        styleSrc: ['self', 'unsafe-inline', 'http://unpkg.com'],
+        generateNonces: false
+      }
     },
     {
       plugin: Sso,

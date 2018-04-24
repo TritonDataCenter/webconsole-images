@@ -6,6 +6,7 @@ const Brule = require('brule');
 const Api = require('cloudapi-gql');
 const Crumb = require('crumb');
 const Hapi = require('hapi');
+const HapiPino = require('hapi-pino');
 const Sso = require('hapi-triton-auth');
 const Inert = require('inert');
 const Ui = require('my-joy-images');
@@ -31,7 +32,6 @@ const {
 const server = Hapi.server({
   port: PORT,
   host: '0.0.0.0',
-  debug: { request: ['error'] },
   routes: {
     security: {
       hsts: true,
@@ -45,97 +45,105 @@ const server = Hapi.server({
 
 process.on('unhandledRejection', (err) => {
   server.log(['error'], err);
-  console.error(err);
 });
 
 async function main () {
-  await server.register([
-    {
-      plugin: Brule,
-      options: {
-        auth: false
-      }
-    },
-    {
-      plugin: Crumb,
-      options: {
-        restful: true,
-        cookieOptions: {
-          isSecure: COOKIE_SECURE !== '0',
-          domain: COOKIE_DOMAIN,
-          isHttpOnly: false,
-          ttl: 4000 * 60 * 60       // 4 hours
+  try {
+    await server.register([
+      {
+        plugin: Brule,
+        options: {
+          auth: false
         }
-      }
-    },
-    {
-      plugin: Inert
-    },
-    {
-      plugin: Scooter
-    },
-    {
-      plugin: Blankie.plugin,
-      options: {
-        defaultSrc: ['self'],
-        imgSrc: ['*', 'data:'],
-        scriptSrc: ['self', 'unsafe-inline', 'http://unpkg.com', 'http://cdn.jsdelivr.net'],
-        styleSrc: ['self', 'unsafe-inline', 'http://unpkg.com'],
-        generateNonces: false
-      }
-    },
-    {
-      plugin: Sso,
-      options: {
-        ssoUrl: SSO_URL,
-        baseUrl: BASE_URL,
-        apiBaseUrl: SDC_URL,
-        keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
-        keyPath: SDC_KEY_PATH,
-        permissions: { cloudapi: ['/my/*'] },
-        isDev: NODE_ENV === 'development',
-        cookie: {
-          isHttpOnly: COOKIE_HTTP_ONLY !== '0',
-          isSecure: COOKIE_SECURE !== '0',
-          password: COOKIE_PASSWORD,
-          ttl: 4000 * 60 * 60,       // 4 hours
-          domain: COOKIE_DOMAIN
-        }
-      }
-    },
-    {
-      plugin: Ui
-    },
-    {
-      plugin: Api,
-      options: {
-        keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
-        keyPath: SDC_KEY_PATH,
-        apiBaseUrl: SDC_URL
       },
-      routes: {
-        prefix: `/${NAMESPACE}`
-      }
-    }
-  ]);
-
-  server.auth.default('sso');
-
-  server.route({
-    method: 'get',
-    path: `/${NAMESPACE}/versions`,
-    config: {
-      auth: false,
-      handler: {
-        file: {
-          path: join(__dirname, 'versions.json')
+      {
+        plugin: Crumb,
+        options: {
+          restful: true,
+          cookieOptions: {
+            isSecure: COOKIE_SECURE !== '0',
+            domain: COOKIE_DOMAIN,
+            isHttpOnly: false,
+            ttl: 4000 * 60 * 60       // 4 hours
+          }
+        }
+      },
+      {
+        plugin: Inert
+      },
+      {
+        plugin: Scooter
+      },
+      {
+        plugin: Blankie.plugin,
+        options: {
+          defaultSrc: ['self'],
+          imgSrc: ['*', 'data:'],
+          scriptSrc: ['self', 'unsafe-inline', 'http://unpkg.com', 'http://cdn.jsdelivr.net'],
+          styleSrc: ['self', 'unsafe-inline', 'http://unpkg.com'],
+          generateNonces: false
+        }
+      },
+      {
+        plugin: Sso,
+        options: {
+          ssoUrl: SSO_URL,
+          baseUrl: BASE_URL,
+          apiBaseUrl: SDC_URL,
+          keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
+          keyPath: SDC_KEY_PATH,
+          permissions: { cloudapi: ['/my/*'] },
+          isDev: NODE_ENV === 'development',
+          cookie: {
+            isHttpOnly: COOKIE_HTTP_ONLY !== '0',
+            isSecure: COOKIE_SECURE !== '0',
+            password: COOKIE_PASSWORD,
+            ttl: 4000 * 60 * 60,       // 4 hours
+            domain: COOKIE_DOMAIN
+          }
+        }
+      },
+      {
+        plugin: Ui
+      },
+      {
+        plugin: Api,
+        options: {
+          keyId: '/' + SDC_ACCOUNT + '/keys/' + SDC_KEY_ID,
+          keyPath: SDC_KEY_PATH,
+          apiBaseUrl: SDC_URL
+        },
+        routes: {
+          prefix: `/${NAMESPACE}`
+        }
+      },
+      {
+        plugin: HapiPino,
+        options: {
+          prettyPrint: NODE_ENV !== 'production'
         }
       }
-    }
-  });
+    ]);
 
-  await server.start();
-  console.log(`server started at http://localhost:${server.info.port}`);
+    server.auth.default('sso');
+
+    server.route({
+      method: 'get',
+      path: `/${NAMESPACE}/versions`,
+      config: {
+        auth: false,
+        handler: {
+          file: {
+            path: join(__dirname, 'versions.json')
+          }
+        }
+      }
+    });
+
+    await server.start();
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 main();

@@ -27,9 +27,8 @@
     "cloudapi-gql": "7.1.4",
     "crumb": "7.0.0",
     "hapi": "17.2.3",
-    "hapi-triton-auth": "2.0.1",
+    "hapi-triton-auth": "3.0.0",
     "inert": "5.1.0",
-    "instana-nodejs-sensor": "1.37.1",
     "my-joy-images": "1.4.2",
     "scooter": "5.0.0"
   },

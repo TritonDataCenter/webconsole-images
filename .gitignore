@@ -65,3 +65,5 @@ test.xml
 test.html
 
 .DS_Store
+package-lock.json
+.vscode/

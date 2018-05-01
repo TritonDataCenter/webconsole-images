@@ -49,10 +49,6 @@ const server = Hapi.server({
   }
 });
 
-process.on('unhandledRejection', (err) => {
-  server.log(['error'], err);
-});
-
 async function main () {
   try {
     await server.register([
